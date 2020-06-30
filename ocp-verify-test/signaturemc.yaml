@@ -1,0 +1,27 @@
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: worker
+  name: 50-worker-signatures
+spec:
+  config:
+    ignition:
+      version: 2.2.0
+    storage:
+      files:
+      - path: /etc/containers/policy.json
+        mode: 0644
+        filesystem: root
+        contents:
+          source: data:,%7B%0A%20%20%20%20%22default%22%3A%20%5B%0A%20%20%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%22type%22%3A%20%22insecureAcceptAnything%22%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%5D%2C%0A%20%20%20%20%22transports%22%3A%0A%20%20%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%22docker-daemon%22%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22%22%3A%20%5B%7B%22type%22%3A%22insecureAcceptAnything%22%7D%5D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22docker%22%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22quay.io%22%3A%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22type%22%3A%20%22signedBy%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22keyType%22%3A%20%22GPGKeys%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22keyPath%22%3A%20%22/etc/pki/developers/public.gpg%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22docker.io%22%3A%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22type%22%3A%20%22signedBy%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22keyType%22%3A%20%22GPGKeys%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22keyPath%22%3A%20%22/etc/pki/developers/public.gpg%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%5D%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%7D%0A%7D%0A%0A
+      - path: /etc/containers/registries.d/default.yaml
+        mode: 0644
+        filesystem: root
+        contents:
+          source: data:,default-docker%3A%0A%20%20%23%20sigstore%3A%20file%3A///var/lib/atomic/sigstore%0A%20%0A%20%20sigstore-staging%3A%20file%3A///var/lib/atomic/sigstore%0A%0Adocker%3A%0A%20%20%20%20quay.io%3A%0A%20%20%20%20%20%20sigstore%3A%20https%3A//raw.githubusercontent.com/cwangVT/image-signatures/master/quay.io%0A%20%20%20%20docker.io%3A%0A%20%20%20%20%20%20sigstore%3A%20https%3A//raw.githubusercontent.com/cwangVT/image-signatures/master/docker.io%0A%0A
+      - path: /etc/pki/developers/public.gpg
+        mode: 0644
+        filesystem: root
+        contents:
+          source: data:,-----BEGIN%20PGP%20PUBLIC%20KEY%20BLOCK-----%0AVersion%3A%20GnuPG%20v2%0A%0AmQENBF71OoABCADjebwTdIum87/rzQQoepca9JkOoOzwajfNX3F1LBNlZOIkdlyu%0A7LlC7SLpG0ClpVS6PWfWB3GdEEd%2Bl7qhF1%2BovWLMJQ8UKU%2BW8i0Z8TgoXBe1BhDV%0AH2p3xwo2f/JkGtXPRZmAw3pUTA%2Bdpriz0xNdO/W7pLnvy3mB4GlM6xOWPd7ybLjA%0AN0dk3RDhERfxGGUb3MX9%2BNVG7J0bPv6V916SfgAGFhk%2BHHjET19DQv%2BgZdO0r8ZD%0AMrxyK54m2Tf1yMKjBAvND10ElaW1xgrX4/5zYHf9UQwilmQWR4xhqWISBzUMUc1d%0AAt4wiqs6yo6xni24drrN/V6aPdDjFQc4AH39ABEBAAG0JENsb3VkUGxhdGZvcm1D%0Ab21tb25TZXJ2aWNlc0ltYWdlQ2VydIkBOQQTAQgAIwUCXvU6gAIbLwcLCQgHAwIB%0ABhUIAgkKCwQWAgMBAh4BAheAAAoJEOdy0nPbGmuYPBgH/2M/nAhpR1TdwgU5uOII%0Asd8r/BXPGyuwp9JV/Gu0WE7McfjJ1C7Cq%2BRo6bJOZCwG5w/n9%2BDUqE/seFH4nk%2B%2B%0AedsscibmA%2B/LN7SmGak7UjHUqX5k2aPipotf5fjLBIiN6ZiqmuRj00bU1O7L4CpW%0A2PyZFMni%2B/4N8fB/gtq%2BWLKsaRlylN46k5wt2R8l1FI0NSvyvcoBZKMMjpaZk5rS%0AaJvmmAccn4Z3ekz44%2Bfcy1cVXJ7GQYBH%2B3sxDSU8lySiJv5j9KwRahkjwMHJYJuE%0AWBE5UJ9LkEjVN%2BjOVi6i5awZbm2czBWhuzZ6fRHDESi%2BdGSsh2Kdu74iHYXH804O%0AtlM%3D%0A%3DeuEm%0A-----END%20PGP%20PUBLIC%20KEY%20BLOCK-----%0A
